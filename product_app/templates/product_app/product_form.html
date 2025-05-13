@@ -1,0 +1,42 @@
+{% extends 'product_app/base.html' %}
+{% block title %}Add Product | ItemHub{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <form method="post" class="shadow-lg p-4 rounded bg-white">
+        <h2 class="text-center mb-4 text-primary fw-bold">
+          {% if form.instance.id %} Update {% else %} Add {% endif %} Product
+        </h2>
+        {% csrf_token %}
+
+        <!-- Product Name Field -->
+        <div class="mb-4">
+          <label for="id_name" class="form-label fw-semibold">Product Name</label>
+          <input type="text" name="name" id="id_name" class="form-control" placeholder="Enter product name" value="{{ form.name.value }}" required>
+        </div>
+
+        <!-- Product Description Field -->
+        <div class="mb-4">
+          <label for="id_description" class="form-label fw-semibold">Product Description</label>
+          <textarea name="description" id="id_description" class="form-control" rows="4" placeholder="Enter product description" required>{{ form.description.value }}</textarea>
+        </div>
+
+        <!-- Product Price Field -->
+        <div class="mb-4">
+          <label for="id_price" class="form-label fw-semibold">Product Price ($)</label>
+          <input type="number" name="price" id="id_price" class="form-control" placeholder="Enter product price" value="{{ form.price.value }}" required>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mb-4">
+          <button type="submit" class="btn btn-primary w-100 p-2">
+            {% if form.instance.id %} Update {% else %} Add {% endif %} Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

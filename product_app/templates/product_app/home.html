@@ -1,0 +1,48 @@
+{% extends 'product_app/base.html' %}
+{% block title %}ItemHub{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+  <h2 class="text-center mb-4 text-primary fw-bold">
+    Welcome to <span class="text-dark">ItemHub</span>
+  </h2>
+
+  {% if products %}
+  <div class="table-responsive shadow rounded">
+    <table class="table table-hover border">
+      <thead class="table-secondary">
+        <tr class="text-center">
+          <th>Name</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr class="text-center align-middle">
+          <td class="fw-semibold">{{ p.name }}</td>
+          <td>{{ p.description|truncatechars:60 }}</td>
+          <td><span class="badge bg-success">${{ p.price }}</span></td>
+          <td>
+            {% if request.user.is_authenticated and p.user == request.user %}
+              <a href="{% url 'update_product' p.id %}" class="btn btn-sm btn-outline-warning me-2">Edit</a>
+              <a href="{% url 'delete_product' p.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            {% else %}
+              <span class="text-muted">No Access</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center mt-4">
+    No products available. Be the first to add one!
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

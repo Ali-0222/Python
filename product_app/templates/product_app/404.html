@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            font-size: 72px;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .app-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #fff;
+            color: #2575fc;
+            padding: 12px 30px;
+            font-size: 18px;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #6a11cb;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-img {
+            max-width: 250px;
+            margin-top: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-15px);
+            }
+
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Oops! Page Not Found (404)</h1>
+    <p>The page you are looking for does not exist.</p>
+    <a href="/" class="btn">Go to Home</a>
+    <img src="https://img.icons8.com/ios/452/error.png" alt="404" class="error-img">
+    <p class="app-name">Powered by <strong>ItemHub</strong></p>
+
+</body>
+
+</html>
