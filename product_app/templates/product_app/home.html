@@ -1,4 +1,5 @@
 {% extends 'product_app/base.html' %}
+
 {% block title %}ItemHub{% endblock %}
 
 {% block content %}
@@ -26,11 +27,15 @@
           <td>{{ p.description|truncatechars:60 }}</td>
           <td><span class="badge bg-success">${{ p.price }}</span></td>
           <td>
-            {% if request.user.is_authenticated and p.user == request.user %}
-              <a href="{% url 'update_product' p.id %}" class="btn btn-sm btn-outline-warning me-2">Edit</a>
-              <a href="{% url 'delete_product' p.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            {% if request.user.is_authenticated %}
+              {% if p.user == request.user %}
+                <a href="{% url 'update_product' p.id %}" class="btn btn-sm btn-outline-warning me-2">Edit</a>
+                <a href="{% url 'delete_product' p.id %}" class="btn btn-sm btn-outline-danger me-2">Delete</a>
+              {% else %}
+                <a href="{% url 'buy_product' p.id %}" class="btn btn-sm btn-outline-primary">Buy</a>
+              {% endif %}
             {% else %}
-              <span class="text-muted">No Access</span>
+              <span class="text-muted">Login to buy</span>
             {% endif %}
           </td>
         </tr>
@@ -41,6 +46,25 @@
   {% else %}
   <div class="alert alert-info text-center mt-4">
     No products available. Be the first to add one!
+  </div>
+  {% endif %}
+
+  {% if request.user.is_authenticated %}
+  <div class="mt-5">
+    <h4 class="text-center">Your Purchases</h4>
+    {% if purchased_items.exists %}
+    <div class="list-group">
+      {% for order in purchased_items %}
+      <div class="list-group-item">
+        <strong>{{ order.product.name }}</strong> - ${{ order.product.price }}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-4">
+      You haven't bought anything yet.
+    </div>
+    {% endif %}
   </div>
   {% endif %}
 
