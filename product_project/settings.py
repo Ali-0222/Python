@@ -133,3 +133,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'bianchi.houghgjb0ffq0y@gmail.com'
 EMAIL_HOST_PASSWORD = 'xlyg rfxr omeq ewml'
+
+STRIPE_SECRET_KEY = 'sk_test_51ROcD0P09gSUI9IfcFyR9v4jymPICzkSTui8NWpSpVM7Y6Jmil34uB9IRlotvvjYl5QqlO0qslAh9L11zbPx3orY003cZWyrXt'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51ROcD0P09gSUI9Ifz0kA9BDvhauesn0qPg6ql1GUKiESuSjMHOtn8UNUt8gVkplPIad1nXv7t3vkUJHT2zmi31kw004BGeyMxC'
+DOMAIN_URL = 'http://127.0.0.1:8000/'  # Adjust for production
