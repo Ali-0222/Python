@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, redirect, get_object_or_404 # type: ignore
 from .forms import CustomUserCreationForm, ProductForm
-from .models import Product
+from .models import Order, Product
 from django.contrib.auth.decorators import login_required # type: ignore
 from django.contrib.auth import logout # type: ignore
 import random
@@ -12,11 +12,19 @@ from .models import CustomUser
 from django.contrib import messages # type: ignore
 from django.contrib.auth import get_user_model # type: ignore
 from django.shortcuts import render # type: ignore
+import stripe # type: ignore
+from django.views.decorators.csrf import csrf_exempt # type: ignore
+from django.http import JsonResponse, HttpResponse # type: ignore
 
 
 def home(request):
     products = Product.objects.all()
-    return render(request, 'product_app/home.html', {'products': products})
+    purchased_items = Order.objects.filter(user=request.user) if request.user.is_authenticated else Order.objects.none()
+    return render(request, 'product_app/home.html', {
+        'products': products,
+        'purchased_items': purchased_items
+    })
+
 
 
 @login_required
@@ -171,3 +179,98 @@ def reset_password(request):
 
 def custom_404(request, exception):
     return render(request, 'product_app/404.html', status=404)
+
+stripe.api_key = settings.STRIPE_SECRET_KEY  # ✅ Global Stripe config
+
+# ✅ Simulated product purchase (no real Stripe payment)
+@login_required
+def buy_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if product.user == request.user:
+        messages.warning(request, "You cannot buy your own product.")
+        return redirect("home")
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': product.name,
+                    },
+                    'unit_amount': int(product.price * 100),  # Convert to cents
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url='http://127.0.0.1:8000/success/',
+            cancel_url='http://127.0.0.1:8000/cancel/',
+            customer_email=request.user.email,
+        )
+        return redirect(checkout_session.url)
+
+    except Exception as e:
+        messages.error(request, f"Error creating Stripe session: {e}")
+        return redirect("home")
+
+
+@login_required
+def create_checkout_session(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if product.user == request.user:
+        messages.warning(request, "You cannot buy your own product.")
+        return redirect('home')
+
+    checkout_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': product.name,
+                },
+                'unit_amount': int(product.price * 100),
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=request.build_absolute_uri('/success/'),
+        cancel_url=request.build_absolute_uri('/cancel/'),
+    )
+
+    # ✅ Just store session info for later use (e.g., in success view)
+    request.session['product_id'] = product.id
+    request.session['checkout_session_id'] = checkout_session.id
+
+    return redirect(checkout_session.url)
+
+
+@login_required
+def payment_success(request):
+    product_id = request.session.get('product_id')
+    checkout_session_id = request.session.get('checkout_session_id')
+
+    if not product_id or not checkout_session_id:
+        messages.error(request, "Invalid session data.")
+        return redirect('home')
+
+    product = get_object_or_404(Product, id=product_id)
+
+    # ✅ Prevent duplicate orders
+    if not Order.objects.filter(user=request.user, stripe_checkout_session_id=checkout_session_id).exists():
+        Order.objects.create(
+            user=request.user,
+            product=product,
+            stripe_checkout_session_id=checkout_session_id
+        )
+
+    messages.success(request, "Payment successful! Your order is confirmed.")
+    return redirect('home')
+
+
+# ✅ Payment cancel page
+def payment_cancel(request):
+    return render(request, 'product_app/cancel.html')
